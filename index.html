@@ -151,12 +151,43 @@
         <section class="contact" id="contact">
             <div class="contact-card">
                 <h2>Siap Mengembangkan Akun Anda?</h2>
-                <p>Kirim pesan sekarang dan dapatkan paket terbaik yang sesuai dengan kebutuhan Anda.</p>
-                <p class="owner-note">Hai, saya Abdansya dari AX Pannel. Jika Anda ingin hasil cepat dan personal, chat lewat WhatsApp dulu saja supaya saya bisa langsung bantu cek paket terbaik sesuai akun Anda.</p>
-                <div class="contact-buttons">
-                    <a id="whatsappLink" class="btn btn--secondary" target="_blank" rel="noopener noreferrer">Chat WhatsApp</a>
-                    <a id="emailLink" class="btn btn--primary" target="_blank" rel="noopener noreferrer">Kirim Email</a>
-                </div>
+                <p>Pilih paket yang Anda inginkan, lalu lanjutkan pemesanan lewat WhatsApp atau email. Harga akan saya kabarkan langsung saat chat.</p>
+                <p class="owner-note">Hai, saya Abdansya dari AX Pannel. Saya bisa bantu pilih paket yang paling cocok untuk akun Anda, lalu kita bahas harga dan detailnya saat chat.</p>
+
+                <form class="order-form" id="orderForm">
+                    <div class="form-group">
+                        <label for="contactMethod">Pilih cara pemesanan</label>
+                        <div class="choice-pills" role="radiogroup" aria-label="Cara pemesanan">
+                            <button type="button" class="pill-option pill-option--active" data-method="whatsapp">WhatsApp</button>
+                            <button type="button" class="pill-option" data-method="email">Email</button>
+                        </div>
+                        <input type="hidden" id="contactMethod" name="contactMethod" value="whatsapp">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="packageType">Pilih paket</label>
+                        <select id="packageType" name="packageType" required>
+                            <option value="">-- Pilih paket --</option>
+                            <option value="Followers">Followers</option>
+                            <option value="Likes">Likes</option>
+                            <option value="Views">Views</option>
+                            <option value="Campuran">Campuran (Followers + Likes + Views)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountDetails">Nama akun / link akun</label>
+                        <input type="text" id="accountDetails" name="accountDetails" placeholder="Contoh: @username atau link akun" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="orderNote">Keterangan singkat</label>
+                        <textarea id="orderNote" name="orderNote" rows="4" placeholder="Ceritakan kebutuhan Anda, target, atau detail yang ingin dipenuhi." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary">Lanjut ke Chat</button>
+                    <p class="form-note">Setelah form ini diisi, Anda akan diarahkan ke WhatsApp atau email untuk melanjutkan pembahasan paket.</p>
+                </form>
             </div>
         </section>
 
@@ -265,14 +296,40 @@
         updateStarButtons(selectedRating);
         updatePreview();
 
-        const whatsappLink = document.getElementById('whatsappLink');
-        const emailLink = document.getElementById('emailLink');
-        const whatsappMessage = encodeURIComponent('Halo AX Pannel, saya ingin meningkatkan performa akun saya dengan followers, like, dan views yang aman dan cepat. Mohon bantuannya untuk memilih paket terbaik yang cocok untuk akun saya. Terima kasih.');
-        const emailSubject = encodeURIComponent('Permintaan Paket Layanan AX Pannel');
-        const emailBody = encodeURIComponent('Halo AX Pannel,\n\nSaya ingin meningkatkan performa akun saya dengan dukungan followers, likes, dan views. Mohon bantuannya untuk rekomendasi paket terbaik yang cocok untuk tujuan saya.\n\nTerima kasih.\n');
+        const orderForm = document.getElementById('orderForm');
+        const methodInput = document.getElementById('contactMethod');
+        const methodButtons = document.querySelectorAll('.pill-option');
 
-        whatsappLink.href = `https://wa.me/6285643585243?text=${whatsappMessage}`;
-        emailLink.href = `mailto:abdansyakuro1706@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+        methodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                methodButtons.forEach(item => item.classList.remove('pill-option--active'));
+                button.classList.add('pill-option--active');
+                methodInput.value = button.dataset.method;
+            });
+        });
+
+        orderForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const packageType = document.getElementById('packageType').value;
+            const accountDetails = document.getElementById('accountDetails').value.trim();
+            const orderNote = document.getElementById('orderNote').value.trim();
+            const selectedMethod = methodInput.value;
+
+            if (!packageType || !accountDetails || !orderNote) {
+                alert('Silakan isi paket, akun, dan keterangan singkat sebelum melanjutkan.');
+                return;
+            }
+
+            const whatsappMessage = encodeURIComponent(`Halo AX Pannel, saya ingin memesan paket ${packageType}.\nAkun: ${accountDetails}\nKeterangan: ${orderNote}\n\nSilakan bantu saya cek paket terbaik dan kabarkan harganya saat chat.`);
+            const emailSubject = encodeURIComponent(`Permintaan Paket ${packageType} - AX Pannel`);
+            const emailBody = encodeURIComponent(`Halo AX Pannel,\n\nSaya ingin memesan paket ${packageType}.\nAkun: ${accountDetails}\nKeterangan: ${orderNote}\n\nSilakan bantu saya cek paket terbaik dan kabarkan harganya saat chat.\n`);
+
+            const whatsappLink = `https://wa.me/6285643585243?text=${whatsappMessage}`;
+            const emailLink = `mailto:abdansyakuro1706@gmail.com?subject=${emailSubject}&body=${emailBody}`;
+
+            window.open(selectedMethod === 'email' ? emailLink : whatsappLink, '_blank', 'noopener,noreferrer');
+        });
     </script>
 </body>
 </html>
